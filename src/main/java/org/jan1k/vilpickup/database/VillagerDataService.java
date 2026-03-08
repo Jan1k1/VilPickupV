@@ -30,41 +30,46 @@ public class VillagerDataService {
             return;
         }
 
-        String insertSQL = """
-            INSERT INTO villager_data (world, x, y, z, yaw, pitch, entity_type, nbt_data, 
-                                     profession, villager_level, equipment_data, custom_name) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+        Location location = entity.getLocation().clone();
+        String worldName = location.getWorld().getName();
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+        float yaw = location.getYaw();
+        float pitch = location.getPitch();
+        String entityTypeName = entity.getType().name();
+        String professionName = entity instanceof Villager v ? v.getProfession().name() : null;
+        int villagerLevel = entity instanceof Villager v ? v.getVillagerLevel() : 0;
+        String customName = entity.getCustomName();
 
-        try (Connection connection = databaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(insertSQL)) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            String insertSQL = """
+                INSERT INTO villager_data (world, x, y, z, yaw, pitch, entity_type, nbt_data, 
+                                         profession, villager_level, equipment_data, custom_name) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
-            Location location = entity.getLocation();
-            statement.setString(1, location.getWorld().getName());
-            statement.setDouble(2, location.getX());
-            statement.setDouble(3, location.getY());
-            statement.setDouble(4, location.getZ());
-            statement.setFloat(5, location.getYaw());
-            statement.setFloat(6, location.getPitch());
-            statement.setString(7, entity.getType().name());
-            statement.setString(8, nbtData);
+            try (Connection connection = databaseManager.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(insertSQL)) {
 
-            if (entity instanceof Villager villager) {
-                statement.setString(9, villager.getProfession().name());
-                statement.setInt(10, villager.getVillagerLevel());
-            } else {
-                statement.setString(9, null);
-                statement.setInt(10, 0);
+                statement.setString(1, worldName);
+                statement.setDouble(2, x);
+                statement.setDouble(3, y);
+                statement.setDouble(4, z);
+                statement.setFloat(5, yaw);
+                statement.setFloat(6, pitch);
+                statement.setString(7, entityTypeName);
+                statement.setString(8, nbtData);
+                statement.setString(9, professionName);
+                statement.setInt(10, villagerLevel);
+                statement.setString(11, equipmentData);
+                statement.setString(12, customName);
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to save villager data to database", e);
             }
-
-            statement.setString(11, equipmentData);
-            statement.setString(12, entity.getCustomName());
-
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to save villager data to database", e);
-        }
+        });
     }
 
     public List<VillagerData> getVillagersInRadius(Location center, double radius) {
@@ -133,17 +138,18 @@ public class VillagerDataService {
             return;
         }
 
-        String deleteSQL = "DELETE FROM villager_data WHERE id = ?";
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            String deleteSQL = "DELETE FROM villager_data WHERE id = ?";
 
-        try (Connection connection = databaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(deleteSQL)) {
+            try (Connection connection = databaseManager.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(deleteSQL)) {
 
-            statement.setInt(1, id);
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to delete villager data from database", e);
-        }
+                statement.setInt(1, id);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to delete villager data from database", e);
+            }
+        });
     }
 
     public void cleanupOldData(int daysOld) {
