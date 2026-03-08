@@ -87,7 +87,9 @@ public class NMSSaver implements EntitySaver {
             "net.minecraft.server.v1_19_R3",
             "net.minecraft.server.v1_20_R1", 
             "net.minecraft.server.v1_20_R2",
-            "net.minecraft.server.v1_20_R3"
+            "net.minecraft.server.v1_20_R3",
+            "net.minecraft.server.v1_21_R1",
+            "net.minecraft.server.v1_21_R2"
         };
         
         for (String pattern : patterns) {
