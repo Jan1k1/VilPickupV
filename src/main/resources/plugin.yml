@@ -1,5 +1,5 @@
 name: VilPickupV
-version: '2.2'
+version: '2.3'
 main: org.jan1k.vilpickup.VilPickupV
 api-version: '1.19'
 authors: [ Jan1k ]

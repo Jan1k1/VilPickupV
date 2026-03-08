@@ -31,7 +31,7 @@ A powerful Minecraft plugin that transforms how you interact with villagers. Pic
 
 ## Compatibility
 
-- Minecraft: 1.19.4+
+- Minecraft: 1.19.4 - 1.21.11+
 - Server Software: Paper (recommended), Spigot, Bukkit
 - Java: 17+
 - Dependencies: None required

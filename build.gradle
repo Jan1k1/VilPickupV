@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'org.jan1k'
-version = '2.2'
+version = '2.3'
 
 repositories {
     mavenCentral()
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT") // Note: Using 1.21.1 as baseline API for newer subversions if .11 isn't available, but targeting 1.21.11 for runtime.
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:22.0.0")
     implementation("mysql:mysql-connector-java:8.0.33")
     implementation("com.zaxxer:HikariCP:5.0.1")
