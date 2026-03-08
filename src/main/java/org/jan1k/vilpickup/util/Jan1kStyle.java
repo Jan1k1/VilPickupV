@@ -16,22 +16,22 @@ public class Jan1kStyle {
     
     public static String getRandomPickupMessage() {
         String[] messages = {
-            "Nice catch! That villager is all yours now ✨",
-            "Villager secured! Time to relocate them somewhere better 🏠",
-            "Got 'em! This villager is ready for their new home 🎯",
-            "Smooth pickup! Your villager collection grows stronger 💪",
-            "Villager captured! They'll be much happier in their new spot 😊"
+            "Nice catch! That villager is all yours now.",
+            "Villager secured! Time to relocate them somewhere better.",
+            "Got 'em! This villager is ready for their new home.",
+            "Smooth pickup! Your villager collection grows stronger.",
+            "Villager captured! They should be easier to move now."
         };
         return messages[(int) (Math.random() * messages.length)];
     }
     
     public static String getRandomPlaceMessage() {
         String[] messages = {
-            "Welcome to your new home, little villager! 🏡",
-            "There we go! Hope they like their new neighborhood 🌟",
-            "Villager deployed successfully! Time to let them settle in ✨",
-            "Perfect spot! This villager should be happy here 😄",
-            "Mission accomplished! Another villager finds their place 🎉"
+            "Welcome to your new home, little villager!",
+            "There we go! Hope they like their new neighborhood.",
+            "Villager deployed successfully! Time to let them settle in.",
+            "Perfect spot! This villager should be happy here.",
+            "Mission accomplished! Another villager finds their place."
         };
         return messages[(int) (Math.random() * messages.length)];
     }
