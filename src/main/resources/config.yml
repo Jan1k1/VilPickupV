@@ -1,25 +1,29 @@
 settings:
+  # Whether the player must hold Shift/Sneak to pick up
   require-shift: true
   require-sneak: false
+  # Whether a specific permission is required to use the plugin
   require-permission: false
   permission-node: "vilpickup.use"
-  allowed-entities:
-    - VILLAGER
-    - WANDERING_TRADER
-    - ZOMBIE_VILLAGER
+  # Sound effects for pickup
   pickup-sound: true
   sound-type: "ENTITY_ITEM_PICKUP"
   sound-volume: 1.0
   sound-pitch: 1.0
   
 restrictions:
+  # Maximum distance a player can be from the entity
   max-pickup-distance: 5.0
+  # Cooldown between pickups in seconds
   cooldown-seconds: 0
+  # Prevent picking up entities while the player is in combat
   prevent-pickup-in-combat: false
   combat-time-seconds: 10
   
 item:
+  # The material used for the stored villager item
   material: "PLAYER_HEAD"
+  # Support placeholders: {name}, {profession}, {level}
   name: "&7[Villager] &f{name}"
   lore:
     - "&7Type: &e{profession}"
@@ -27,22 +31,26 @@ item:
     - "&7Right-click to place"
     - ""
     - "&8Stored with VilPickup"
+  # Whether the item should have an enchantment glow
   glow: true
   
 placement:
+  # Whether shift is required to place the villager back down
   require-shift-place: false
+  # Prevent placing in claimed areas (requires supported protection plugins)
   prevent-place-in-claimed: false
+  # Sound effects for placement
   place-sound: true
   place-sound-type: "ENTITY_VILLAGER_AMBIENT"
   
 database:
-  enabled: false  # Enable MySQL data storage
+  # MySQL database settings for logging persistence
+  enabled: false
   host: "localhost"
   port: 3306
   database: "vilpickup"
   username: "root"
   password: "password"
-  # Connection pool settings
   connection-timeout: 30000
   idle-timeout: 600000
   max-lifetime: 1800000
@@ -50,6 +58,7 @@ database:
   minimum-idle: 5
   
 debug:
+  # Debug logging in console
   enabled: false
   log-pickups: false
   log-placements: false

@@ -26,4 +26,5 @@ messages:
     save-failed: "&cFailed to save villager data."
     load-failed: "&cFailed to load villager data."
     
+# Prefix used before all plugin messages
 prefix: "&8[&6VilPickup&8]&r "

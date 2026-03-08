@@ -53,9 +53,6 @@ public class ConfigManager {
         return config.getString("settings.permission-node", "vilpickup.use");
     }
     
-    public List<String> getAllowedEntities() {
-        return config.getStringList("settings.allowed-entities");
-    }
     
     public boolean isPickupSoundEnabled() {
         return config.getBoolean("settings.pickup-sound", true);

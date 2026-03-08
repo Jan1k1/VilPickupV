@@ -85,7 +85,7 @@ public class PickupManager implements Listener {
                 world.playSound(location, sound, configManager.getSoundVolume(), configManager.getSoundPitch());
             }
             Block blockBelow = block.getRelative(BlockFace.DOWN);
-            world.spawnParticle(Particle.BLOCK_CRACK, location, 30, blockBelow.getBlockData());
+            world.spawnParticle(Particle.BLOCK, location, 30, blockBelow.getBlockData());
             
             player.sendMessage(configManager.getMessage("placement.success"));
         } catch (IllegalArgumentException exception) {
@@ -95,11 +95,9 @@ public class PickupManager implements Listener {
 
     public ItemStack toItemStack(LivingEntity entity) throws IllegalArgumentException {
         String entityName = entity.getType().name();
-        if (!configManager.getAllowedEntities().contains(entityName)) {
-            throw new IllegalArgumentException("Entity type not allowed");
+        if (!java.util.Set.of("VILLAGER", "WANDERING_TRADER", "ZOMBIE_VILLAGER").contains(entityName)) {
+            throw new IllegalArgumentException("Entity type not supported");
         }
-        
-        
         ItemStack item = createVillagerItem(entity);
         saveVillagerData(entity, item);
         
@@ -270,7 +268,7 @@ public class PickupManager implements Listener {
             meta.setLore(lore);
             
             if (configManager.isItemGlow()) {
-                meta.addEnchant(org.bukkit.enchantments.Enchantment.DURABILITY, 1, true);
+                meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
                 meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
             }
             

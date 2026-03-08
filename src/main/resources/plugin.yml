@@ -1,15 +1,17 @@
 name: VilPickupV
 version: '2.3'
+# Plugin main class
 main: org.jan1k.vilpickup.VilPickupV
-api-version: '1.19'
+# Minecraft API version
+api-version: '1.21'
 authors: [ Jan1k ]
-description: 'Villager Pickup Plugin'
+description: 'Premium villager pickup plugin with NMS and EntitySnapshot support.'
 website: 'https://jan1k.org'
 prefix: '[jan1k] VilPickup'
 
 commands:
   vilpickup:
-    description: 'VilPickupV main command'
+    description: 'Main plugin command'
     usage: '/vilpickup reload'
     
 permissions:
@@ -17,5 +19,5 @@ permissions:
     description: 'Allows picking up villagers'
     default: true
   vilpickup.admin:
-    description: 'Allows using admin commands'
+    description: 'Allows reloading configuration'
     default: op
