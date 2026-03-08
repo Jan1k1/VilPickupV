@@ -29,7 +29,7 @@ public class DatabaseManager {
 
         try {
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC",
+            config.setJdbcUrl(String.format("jdbc:mysql:
                     configManager.getDatabaseHost(),
                     configManager.getDatabasePort(),
                     configManager.getDatabaseName()));
