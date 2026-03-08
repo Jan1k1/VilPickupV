@@ -1,0 +1,55 @@
+settings:
+  require-shift: true
+  require-sneak: false
+  require-permission: false
+  permission-node: "vilpickup.use"
+  allowed-entities:
+    - VILLAGER
+    - WANDERING_TRADER
+    - ZOMBIE_VILLAGER
+  pickup-sound: true
+  sound-type: "ENTITY_ITEM_PICKUP"
+  sound-volume: 1.0
+  sound-pitch: 1.0
+  
+restrictions:
+  max-pickup-distance: 5.0
+  cooldown-seconds: 0
+  prevent-pickup-in-combat: false
+  combat-time-seconds: 10
+  
+item:
+  material: "PLAYER_HEAD"
+  name: "&7[Villager] &f{name}"
+  lore:
+    - "&7Type: &e{profession}"
+    - "&7Level: &a{level}"
+    - "&7Right-click to place"
+    - ""
+    - "&8Stored with VilPickup"
+  glow: true
+  
+placement:
+  require-shift-place: false
+  prevent-place-in-claimed: false
+  place-sound: true
+  place-sound-type: "ENTITY_VILLAGER_AMBIENT"
+  
+database:
+  enabled: false  # Enable MySQL data storage
+  host: "localhost"
+  port: 3306
+  database: "vilpickup"
+  username: "root"
+  password: "password"
+  # Connection pool settings
+  connection-timeout: 30000
+  idle-timeout: 600000
+  max-lifetime: 1800000
+  maximum-pool-size: 10
+  minimum-idle: 5
+  
+debug:
+  enabled: false
+  log-pickups: false
+  log-placements: false

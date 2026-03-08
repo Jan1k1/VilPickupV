@@ -1,0 +1,24 @@
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/resources/*.jar
+!**/src/test/resources/*.jar
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### Eclipse ###
+.settings/
+.classpath
+.project
+.factorypath
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store

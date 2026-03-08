@@ -1,0 +1,29 @@
+messages:
+  pickup:
+    success: "&aPickup successful! &7{name} stored"
+    no-permission: "&cYou don't have permission to pickup villagers."
+    invalid-entity: "&cYou can only pickup villagers and traders."
+    on-cooldown: "&cPlease wait {time} seconds before picking up again."
+    in-combat: "&cYou cannot pickup villagers while in combat."
+    too-far: "&cYou're too far away to pickup this villager."
+    inventory-full: "&cYour inventory is full!"
+    villager-upgrading: "&cCannot pickup villager while they are upgrading profession"
+    
+  placement:
+    success: "&aVillager placed successfully"
+    no-permission: "&cYou don't have permission to place villagers."
+    invalid-location: "&cYou cannot place a villager here."
+    in-claimed-area: "&cYou cannot place villagers in claimed areas."
+    invalid-item: "&cThis item cannot be placed."
+    placement-failed: "&cFailed to place villager. Try again."
+    
+  general:
+    plugin-disabled: "&cVilPickupV is currently disabled."
+    config-reloaded: "&aConfiguration reloaded successfully!"
+    
+  errors:
+    data-corrupted: "&cVillager data is corrupted and cannot be placed."
+    save-failed: "&cFailed to save villager data."
+    load-failed: "&cFailed to load villager data."
+    
+prefix: "&8[&6VilPickup&8]&r "

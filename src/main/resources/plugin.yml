@@ -1,0 +1,21 @@
+name: VilPickupV
+version: '2.2'
+main: org.jan1k.vilpickup.VilPickupV
+api-version: '1.19'
+authors: [ Jan1k ]
+description: 'Villager Pickup Plugin'
+website: 'https://jan1k.org'
+prefix: '[jan1k] VilPickup'
+
+commands:
+  vilpickup:
+    description: 'VilPickupV main command'
+    usage: '/vilpickup reload'
+    
+permissions:
+  vilpickup.use:
+    description: 'Allows picking up villagers'
+    default: true
+  vilpickup.admin:
+    description: 'Allows using admin commands'
+    default: op
