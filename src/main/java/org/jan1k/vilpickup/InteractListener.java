@@ -16,10 +16,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class InteractListener implements Listener {
     
+    private final JavaPlugin plugin;
     private final PickupManager pickupManager;
     private final ConfigManager configManager;
 
     public InteractListener(JavaPlugin plugin, PickupManager pickupManager, ConfigManager configManager) {
+        this.plugin = plugin;
         this.pickupManager = pickupManager;
         this.configManager = configManager;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -28,29 +30,22 @@ public class InteractListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onVillagerInteract(PlayerInteractEntityEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
+
         Entity entity = event.getRightClicked();
-        
-        String entityName = entity.getType().name();
-        if (!configManager.getAllowedEntities().contains(entityName)) return;
-        
-        LivingEntity villager = (LivingEntity) entity;
+        if (!configManager.getAllowedEntities().contains(entity.getType().name())) return;
+
         Player player = event.getPlayer();
-        
         if (player.getGameMode() == GameMode.SPECTATOR) return;
-        
-        boolean requireShift = configManager.requireShift();
-        boolean requireSneak = configManager.requireSneak();
-        
-        if (requireShift && !player.isSneaking()) return;
-        if (requireSneak && !player.isSneaking()) return;
-        
+
+        if ((configManager.requireShift() || configManager.requireSneak()) && !player.isSneaking()) return;
+
         if (configManager.requirePermission() && !player.hasPermission(configManager.getPermissionNode())) {
             player.sendMessage(configManager.getMessage("pickup.no-permission"));
             return;
         }
-        
+
         event.setCancelled(true);
-        handlePickup(player, villager);
+        handlePickup(player, (LivingEntity) entity);
     }
 
     private void handlePickup(Player player, LivingEntity villager) {
@@ -58,12 +53,12 @@ public class InteractListener implements Listener {
             player.sendMessage(configManager.getMessage("pickup.inventory-full"));
             return;
         }
-        
+
         if (villager instanceof Villager v && isVillagerUpgrading(v)) {
             player.sendMessage(configManager.getMessage("pickup.villager-upgrading"));
             return;
         }
-        
+
         ItemStack item;
         try {
             item = pickupManager.toItemStack(villager);
@@ -71,19 +66,17 @@ public class InteractListener implements Listener {
             player.sendMessage(configManager.getMessage("errors.save-failed"));
             return;
         }
-        
+
         Utils.setHandOrGive(player, item);
-        
+
         String villagerName = villager.getCustomName() != null ? villager.getCustomName() : "Villager";
-        String message = configManager.getMessageNoPrefix("pickup.success").replace("{name}", villagerName);
         player.sendMessage(configManager.getMessage("pickup.success").replace("{name}", villagerName));
         pickupManager.sendPickupEffect(villager);
-        
+
         if (configManager.logPickups()) {
-            System.out.println("[VilPickup] " + player.getName() + " picked up villager at " + villager.getLocation());
+            plugin.getLogger().info(player.getName() + " picked up " + villager.getType().name() + " at " + villager.getLocation());
         }
-    }
-    
+    }    
     private boolean isVillagerUpgrading(Villager villager) {
         return villager.isTrading() || (villager.getProfession() == Villager.Profession.NONE && 
                villager.getVillagerExperience() > 0);
