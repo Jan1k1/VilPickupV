@@ -1,21 +1,20 @@
 # VilPickupV
 
-A powerful Minecraft plugin that transforms how you interact with villagers. Pick up villagers with shift+right-click and place them anywhere with beautiful custom head items that preserve all their data.
+Pick up villagers with shift+right-click and place them again from an item.
 
 ## Features
 
-- Smart Pickup System: Shift+right-click villagers to convert them into portable items
-- Perfect Data Preservation: Maintains trades, profession, level, and all villager properties
-- Custom Head Items: Beautiful player heads with profession-specific textures
-- MySQL Database Support: Optional data persistence with HikariCP connection pooling
-- Dual Compatibility: EntitySnapshot API with NMS fallback for maximum compatibility
-- Zombie Villager Support: Full equipment and data preservation
-- Baby Villager Compatible: Special textures for baby villagers and baby zombies
+- Shift+right-click pickup for villagers and zombie villagers
+- Configurable item name, lore, material, sounds, and glow
+- Villager head items with profession and age-specific textures when `PLAYER_HEAD` is used
+- EntitySnapshot-first restore path with an NMS saver fallback in this codebase
+- Optional MySQL storage through HikariCP
+- Zombie villager equipment data stored in the pickup item and database
 
 ## Supported Entities
 
 - Regular Villagers (all professions)
-- Baby Villagers  
+- Baby Villagers
 - Zombie Villagers
 - Baby Zombie Villagers
 - Wandering Traders
@@ -31,16 +30,17 @@ A powerful Minecraft plugin that transforms how you interact with villagers. Pic
 
 ## Compatibility
 
-- Minecraft: 1.19.4 - 1.21.11+
-- Server Software: Paper (recommended), Spigot, Bukkit
-- Java: 17+
-- Dependencies: None required
+- Built against Paper `1.21.11-R0.1-SNAPSHOT`
+- Java `21`
+- Uses MySQL Connector/J and HikariCP inside the plugin jar
+- Older or non-Paper servers may work only if the included saver path still matches their internals
 
 ## Links
 
-- Download: [SpigotMC Resource Page](https://www.spigotmc.org/resources/vilpickupv.127782/)
-- Issues: [GitHub Issues](https://github.com/Jan1k1/VilPickupV/issues)
+- Site: [jan1k.org](https://jan1k.org)
+- GitHub: [Jan1k1/VilPickupV](https://github.com/Jan1k1/VilPickupV)
+- Issues: [github.com/Jan1k1/VilPickupV/issues](https://github.com/Jan1k1/VilPickupV/issues)
 
 ---
 
-**Made by Jan1k**
+Made by Jan1k

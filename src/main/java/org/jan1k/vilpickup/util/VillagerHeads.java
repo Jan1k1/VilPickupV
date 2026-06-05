@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.profile.PlayerProfile;
 
 import java.net.URI;
@@ -55,7 +56,7 @@ public class VillagerHeads {
             URL texture = getTexture(entity);
             setEntityTexture(item, texture);
         } catch (Exception exception) {
-            System.err.println("Failed to set villager texture: " + exception.getMessage());
+            JavaPlugin.getProvidingPlugin(VillagerHeads.class).getLogger().warning("Failed to set villager texture: " + exception.getMessage());
         }
     }
 

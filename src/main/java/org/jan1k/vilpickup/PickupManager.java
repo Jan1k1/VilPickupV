@@ -21,6 +21,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 public class PickupManager implements Listener {
     
@@ -42,11 +49,13 @@ public class PickupManager implements Listener {
     private final NamespacedKey PROFESSION_KEY;
     private final NamespacedKey LEVEL_KEY;
     private final NamespacedKey EQUIPMENT_KEY;
+    private final JavaPlugin plugin;
     private final EntitySaver entitySaver;
     private final ConfigManager configManager;
     private final VillagerDataService villagerDataService;
 
     public PickupManager(JavaPlugin plugin, EntitySaver entitySaver, ConfigManager configManager, VillagerDataService villagerDataService) {
+        this.plugin = plugin;
         this.entitySaver = entitySaver;
         this.configManager = configManager;
         this.villagerDataService = villagerDataService;
@@ -256,7 +265,7 @@ public class PickupManager implements Listener {
         
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(villagerType);
+            meta.setDisplayName(displayName);
             
             java.util.List<String> lore = new java.util.ArrayList<>();
             for (String line : configManager.getItemLore()) {
@@ -278,48 +287,80 @@ public class PickupManager implements Listener {
     }
 
     private String serializeEquipment(EntityEquipment equipment) {
-        StringBuilder sb = new StringBuilder();
+        if (equipment == null) return "";
         ItemStack[] items = {
             equipment.getItemInMainHand(),
-            equipment.getItemInOffHand(), 
+            equipment.getItemInOffHand(),
             equipment.getHelmet(),
             equipment.getChestplate(),
             equipment.getLeggings(),
             equipment.getBoots()
         };
-        
-        for (int i = 0; i < items.length; i++) {
-            if (i > 0) sb.append("|");
-            ItemStack item = items[i];
-            if (item != null && item.getType() != Material.AIR) {
-                sb.append(item.getType().name()).append(":").append(item.getAmount());
+
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(output)) {
+            dataOutput.writeInt(items.length);
+            for (ItemStack item : items) {
+                dataOutput.writeObject(item);
             }
+            dataOutput.flush();
+            return Base64.getEncoder().encodeToString(output.toByteArray());
+        } catch (IOException exception) {
+            plugin.getLogger().warning("Failed to serialize equipment: " + exception.getMessage());
+            return "";
         }
-        return sb.toString();
     }
-    
+
     private void deserializeEquipment(EntityEquipment equipment, String data) {
         if (data == null || data.isEmpty()) return;
-        String[] parts = data.split("\\|");
         try {
-            for (int i = 0; i < Math.min(parts.length, 6); i++) {
-                if (parts[i].isEmpty()) continue;
-                String[] itemParts = parts[i].split(":");
-                Material material = Material.valueOf(itemParts[0]);
-                int amount = Integer.parseInt(itemParts[1]);
-                ItemStack item = new ItemStack(material, amount);
-                
-                switch (i) {
-                    case 0 -> equipment.setItemInMainHand(item);
-                    case 1 -> equipment.setItemInOffHand(item);
-                    case 2 -> equipment.setHelmet(item);
-                    case 3 -> equipment.setChestplate(item);
-                    case 4 -> equipment.setLeggings(item);
-                    case 5 -> equipment.setBoots(item);
-                }
+            ItemStack[] items = deserializeSerializedEquipment(data);
+            applyEquipment(equipment, items);
+        } catch (Exception ignored) {
+            try {
+                applyEquipment(equipment, deserializeLegacyEquipment(data));
+            } catch (Exception exception) {
+                plugin.getLogger().warning("Failed to deserialize equipment: " + exception.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Failed to deserialize equipment: " + e.getMessage());
+        }
+    }
+
+    private ItemStack[] deserializeSerializedEquipment(String data) throws IOException, ClassNotFoundException {
+        byte[] bytes = Base64.getDecoder().decode(data);
+        try (BukkitObjectInputStream input = new BukkitObjectInputStream(new ByteArrayInputStream(bytes))) {
+            int length = input.readInt();
+            ItemStack[] items = new ItemStack[Math.min(length, 6)];
+            for (int i = 0; i < items.length; i++) {
+                items[i] = (ItemStack) input.readObject();
+            }
+            return items;
+        }
+    }
+
+    private ItemStack[] deserializeLegacyEquipment(String data) {
+        String[] parts = data.split("\\|");
+        ItemStack[] items = new ItemStack[Math.min(parts.length, 6)];
+        for (int i = 0; i < items.length; i++) {
+            if (parts[i].isEmpty()) continue;
+            String[] itemParts = parts[i].split(":");
+            Material material = Material.valueOf(itemParts[0]);
+            int amount = Integer.parseInt(itemParts[1]);
+            items[i] = new ItemStack(material, amount);
+        }
+        return items;
+    }
+
+    private void applyEquipment(EntityEquipment equipment, ItemStack[] items) {
+        for (int i = 0; i < items.length; i++) {
+            ItemStack item = items[i];
+            switch (i) {
+                case 0 -> equipment.setItemInMainHand(item);
+                case 1 -> equipment.setItemInOffHand(item);
+                case 2 -> equipment.setHelmet(item);
+                case 3 -> equipment.setChestplate(item);
+                case 4 -> equipment.setLeggings(item);
+                case 5 -> equipment.setBoots(item);
+            }
         }
     }
 
