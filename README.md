@@ -30,8 +30,8 @@ Pick up villagers with shift+right-click and place them again from an item.
 
 ## Compatibility
 
-- Built against Paper `1.21.11-R0.1-SNAPSHOT`
-- Java `21`
+- Built against Paper `26.1.2.build.69-stable`
+- Java `25`
 - Uses MySQL Connector/J and HikariCP inside the plugin jar
 - Older or non-Paper servers may work only if the included saver path still matches their internals
 

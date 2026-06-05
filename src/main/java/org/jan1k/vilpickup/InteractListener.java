@@ -69,7 +69,8 @@ public class InteractListener implements Listener {
 
         Utils.setHandOrGive(player, item);
 
-        String villagerName = villager.getCustomName() != null ? villager.getCustomName() : "Villager";
+        String customName = Utils.legacyText(villager.customName());
+        String villagerName = customName != null ? customName : "Villager";
         player.sendMessage(configManager.getMessage("pickup.success").replace("{name}", villagerName));
         pickupManager.sendPickupEffect(villager);
 

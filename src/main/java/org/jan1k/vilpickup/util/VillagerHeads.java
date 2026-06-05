@@ -6,7 +6,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.PlayerProfile;
 
 import java.net.URI;
 import java.net.URL;
@@ -44,7 +44,7 @@ public class VillagerHeads {
         
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if (meta != null && displayName != null) {
-            meta.setDisplayName(displayName);
+            meta.displayName(Utils.legacyComponent(displayName));
             item.setItemMeta(meta);
         }
         
@@ -63,9 +63,9 @@ public class VillagerHeads {
     private static void setEntityTexture(ItemStack item, URL texture) {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if (meta == null) return;
-        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+        PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
         profile.getTextures().setSkin(texture);
-        meta.setOwnerProfile(profile);
+        meta.setPlayerProfile(profile);
         item.setItemMeta(meta);
     }
 

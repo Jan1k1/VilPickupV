@@ -1,6 +1,8 @@
 package org.jan1k.vilpickup.database;
 
+import org.jan1k.vilpickup.util.Utils;
 import org.bukkit.Location;
+import org.bukkit.Registry;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
@@ -14,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 
 public class VillagerDataService {
@@ -38,9 +41,9 @@ public class VillagerDataService {
         float yaw = location.getYaw();
         float pitch = location.getPitch();
         String entityTypeName = entity.getType().name();
-        String professionName = entity instanceof Villager v ? v.getProfession().name() : null;
+        String professionName = entity instanceof Villager v ? Registry.VILLAGER_PROFESSION.getKey(v.getProfession()).getKey().toUpperCase(Locale.ROOT) : null;
         int villagerLevel = entity instanceof Villager v ? v.getVillagerLevel() : 0;
-        String customName = entity.getCustomName();
+        String customName = Utils.legacyText(entity.customName());
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             String insertSQL = """

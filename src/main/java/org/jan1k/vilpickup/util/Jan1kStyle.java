@@ -1,18 +1,16 @@
 package org.jan1k.vilpickup.util;
 
-import org.bukkit.ChatColor;
-
 public class Jan1kStyle {
     
-    public static final String PREFIX = ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "jan1k" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
-    public static final String BRAND = ChatColor.GOLD + "jan1k" + ChatColor.RESET;
-    public static final String PLUGIN_NAME = ChatColor.GRAY + "VilPickup" + ChatColor.YELLOW + "V" + ChatColor.RESET;
-    public static final String SUCCESS = ChatColor.GREEN + "";
-    public static final String ERROR = ChatColor.RED + "";
-    public static final String WARNING = ChatColor.YELLOW + "";
-    public static final String INFO = ChatColor.AQUA + "";
-    public static final String HIGHLIGHT = ChatColor.GOLD + "";
-    public static final String SECONDARY = ChatColor.GRAY + "";
+    public static final String PREFIX = "\u00A78[\u00A76jan1k\u00A78] \u00A77";
+    public static final String BRAND = "\u00A76jan1k\u00A7r";
+    public static final String PLUGIN_NAME = "\u00A77VilPickup\u00A7eV\u00A7r";
+    public static final String SUCCESS = "\u00A7a";
+    public static final String ERROR = "\u00A7c";
+    public static final String WARNING = "\u00A7e";
+    public static final String INFO = "\u00A7b";
+    public static final String HIGHLIGHT = "\u00A76";
+    public static final String SECONDARY = "\u00A77";
     
     public static String getRandomPickupMessage() {
         String[] messages = {

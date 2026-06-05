@@ -53,6 +53,14 @@ public class ConfigManager {
         return config.getString("settings.permission-node", "vilpickup.use");
     }
     
+    public List<String> getAllowedEntities() {
+        List<String> allowed = config.getStringList("settings.allowed-entities");
+        if (allowed.isEmpty()) {
+            return List.of("VILLAGER", "WANDERING_TRADER", "ZOMBIE_VILLAGER");
+        }
+        return allowed;
+    }
+
     
     public boolean isPickupSoundEnabled() {
         return config.getBoolean("settings.pickup-sound", true);

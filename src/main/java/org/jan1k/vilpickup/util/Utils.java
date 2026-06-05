@@ -1,6 +1,7 @@
 package org.jan1k.vilpickup.util;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -10,9 +11,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class Utils {
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     public static String colorize(String text) {
-        return ChatColor.translateAlternateColorCodes('&', text);
+        return text.replace('&', '\u00A7');
+    }
+
+    public static Component legacyComponent(String text) {
+        return LEGACY.deserialize(text);
+    }
+
+    public static String legacyText(Component component) {
+        return component == null ? null : LEGACY.serialize(component);
     }
 
     public static String formatMaterial(Material material) {

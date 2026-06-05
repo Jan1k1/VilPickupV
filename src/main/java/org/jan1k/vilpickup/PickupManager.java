@@ -5,6 +5,7 @@ import org.jan1k.vilpickup.database.VillagerDataService;
 import org.jan1k.vilpickup.entity.EntitySaver;
 import org.jan1k.vilpickup.util.Utils;
 import org.jan1k.vilpickup.util.VillagerHeads;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -21,13 +22,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Constructor;
 import java.util.Base64;
+import java.util.Locale;
 
 public class PickupManager implements Listener {
     
@@ -90,7 +90,7 @@ public class PickupManager implements Listener {
             World world = player.getWorld();
             
             if (configManager.isPlaceSoundEnabled()) {
-                Sound sound = Sound.valueOf(configManager.getPlaceSoundType());
+                Sound sound = resolveSound(configManager.getPlaceSoundType());
                 world.playSound(location, sound, configManager.getSoundVolume(), configManager.getSoundPitch());
             }
             Block blockBelow = block.getRelative(BlockFace.DOWN);
@@ -142,7 +142,7 @@ public class PickupManager implements Listener {
                 : VillagerType.VILLAGER.toString());
         
         if (entity instanceof Villager villager) {
-            data.set(PROFESSION_KEY, PersistentDataType.STRING, villager.getProfession().name());
+            data.set(PROFESSION_KEY, PersistentDataType.STRING, legacyName(villager.getProfession()));
             data.set(LEVEL_KEY, PersistentDataType.INTEGER, villager.getVillagerLevel());
         }
         
@@ -161,7 +161,7 @@ public class PickupManager implements Listener {
         World world = entity.getWorld();
         world.spawnParticle(Particle.SWEEP_ATTACK, location, 1);
         if (configManager.isPickupSoundEnabled()) {
-            Sound sound = Sound.valueOf(configManager.getSoundType());
+            Sound sound = resolveSound(configManager.getSoundType());
             world.playSound(location, sound, configManager.getSoundVolume(), configManager.getSoundPitch());
         }
     }
@@ -187,7 +187,7 @@ public class PickupManager implements Listener {
             
             if (professionName != null) {
                 try {
-                    Villager.Profession profession = Villager.Profession.valueOf(professionName);
+                    Villager.Profession profession = resolveProfession(professionName);
                     spawnedVillager.setProfession(profession);
                     if (level != null) {
                         spawnedVillager.setVillagerLevel(level);
@@ -217,7 +217,7 @@ public class PickupManager implements Listener {
     }
 
     private ItemStack createVillagerItem(LivingEntity entity) {
-        String customName = entity.getCustomName();
+        String customName = Utils.legacyText(entity.customName());
         String profession = "Unknown";
         String level = "1";
         String villagerType = "Villager";
@@ -228,7 +228,7 @@ public class PickupManager implements Listener {
         
         if (entity instanceof Villager villager) {
             villagerProfession = villager.getProfession();
-            profession = Utils.titleCase(villagerProfession.name().replace("_", " "));
+            profession = Utils.titleCase(legacyName(villagerProfession).replace("_", " "));
             level = String.valueOf(villager.getVillagerLevel());
             
             if (!isAdult) {
@@ -265,16 +265,16 @@ public class PickupManager implements Listener {
         
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(displayName);
+            meta.displayName(Utils.legacyComponent(displayName));
             
-            java.util.List<String> lore = new java.util.ArrayList<>();
+            java.util.List<Component> lore = new java.util.ArrayList<>();
             for (String line : configManager.getItemLore()) {
-                lore.add(line.replace("{name}", name)
+                lore.add(Utils.legacyComponent(line.replace("{name}", name)
                     .replace("{profession}", profession)
                     .replace("{level}", level)
-                    .replace("&", "§"));
+                    .replace("&", "§")));
             }
-            meta.setLore(lore);
+            meta.lore(lore);
             
             if (configManager.isItemGlow()) {
                 meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
@@ -284,6 +284,35 @@ public class PickupManager implements Listener {
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    private Sound resolveSound(String name) {
+        Sound sound = Registry.SOUND_EVENT.get(resolveMinecraftKey(name));
+        if (sound == null) {
+            throw new IllegalArgumentException("Unknown sound: " + name);
+        }
+        return sound;
+    }
+
+    private Villager.Profession resolveProfession(String name) {
+        Villager.Profession profession = Registry.VILLAGER_PROFESSION.get(resolveMinecraftKey(name));
+        if (profession == null) {
+            throw new IllegalArgumentException("Unknown profession: " + name);
+        }
+        return profession;
+    }
+
+    private NamespacedKey resolveMinecraftKey(String name) {
+        String normalized = name.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
+        NamespacedKey key = normalized.contains(":") ? NamespacedKey.fromString(normalized) : NamespacedKey.minecraft(normalized);
+        if (key == null) {
+            throw new IllegalArgumentException("Unknown key: " + name);
+        }
+        return key;
+    }
+
+    private String legacyName(Villager.Profession profession) {
+        return Registry.VILLAGER_PROFESSION.getKey(profession).getKey().toUpperCase(Locale.ROOT);
     }
 
     private String serializeEquipment(EntityEquipment equipment) {
@@ -297,15 +326,9 @@ public class PickupManager implements Listener {
             equipment.getBoots()
         };
 
-        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
-             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(output)) {
-            dataOutput.writeInt(items.length);
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-            dataOutput.flush();
-            return Base64.getEncoder().encodeToString(output.toByteArray());
-        } catch (IOException exception) {
+        try {
+            return Base64.getEncoder().encodeToString(ItemStack.serializeItemsAsBytes(items));
+        } catch (RuntimeException exception) {
             plugin.getLogger().warning("Failed to serialize equipment: " + exception.getMessage());
             return "";
         }
@@ -318,16 +341,26 @@ public class PickupManager implements Listener {
             applyEquipment(equipment, items);
         } catch (Exception ignored) {
             try {
-                applyEquipment(equipment, deserializeLegacyEquipment(data));
+                applyEquipment(equipment, deserializeBukkitObjectEquipment(data));
             } catch (Exception exception) {
-                plugin.getLogger().warning("Failed to deserialize equipment: " + exception.getMessage());
+                try {
+                    applyEquipment(equipment, deserializeLegacyEquipment(data));
+                } catch (Exception legacyException) {
+                    plugin.getLogger().warning("Failed to deserialize equipment: " + legacyException.getMessage());
+                }
             }
         }
     }
 
-    private ItemStack[] deserializeSerializedEquipment(String data) throws IOException, ClassNotFoundException {
+    private ItemStack[] deserializeSerializedEquipment(String data) {
+        return ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode(data));
+    }
+
+    private ItemStack[] deserializeBukkitObjectEquipment(String data) throws Exception {
+        Class<?> streamClass = Class.forName("org.bukkit.util.io.BukkitObjectInputStream");
+        Constructor<?> constructor = streamClass.getConstructor(java.io.InputStream.class);
         byte[] bytes = Base64.getDecoder().decode(data);
-        try (BukkitObjectInputStream input = new BukkitObjectInputStream(new ByteArrayInputStream(bytes))) {
+        try (ObjectInputStream input = (ObjectInputStream) constructor.newInstance(new ByteArrayInputStream(bytes))) {
             int length = input.readInt();
             ItemStack[] items = new ItemStack[Math.min(length, 6)];
             for (int i = 0; i < items.length; i++) {

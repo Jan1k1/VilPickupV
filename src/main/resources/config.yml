@@ -5,6 +5,10 @@ settings:
   # Whether a specific permission is required to use the plugin
   require-permission: false
   permission-node: "vilpickup.use"
+  allowed-entities:
+    - "VILLAGER"
+    - "WANDERING_TRADER"
+    - "ZOMBIE_VILLAGER"
   # Sound effects for pickup
   pickup-sound: true
   sound-type: "ENTITY_ITEM_PICKUP"
